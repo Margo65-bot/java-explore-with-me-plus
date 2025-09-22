@@ -1,14 +1,17 @@
 package ru.practicum.repository;
 
+import com.querydsl.core.Tuple;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.practicum.model.request.Request;
+import ru.practicum.model.request.RequestStatus;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface RequestRepository extends JpaRepository<Request, Long>  {
+public interface RequestRepository extends JpaRepository<Request, Long> {
 
     @Query("""
             select r
@@ -35,5 +38,16 @@ public interface RequestRepository extends JpaRepository<Request, Long>  {
              where e.id = :eventId
                and r.status = :status
             """)
-    int countByEventAndStatus(@Param("eventId") long eventId, @Param("status") String status);
+    long countByEventAndStatus(@Param("eventId") long eventId, @Param("status") RequestStatus status);
+
+    @EntityGraph(attributePaths = "event")
+    List<Request> findByEvent_IdAndEvent_Initiator_Id(Long eventId, Long userId);
+
+    @Query("""
+            SELECT r.event.id, COUNT(r)
+            FROM Request r
+            WHERE r.event.id IN :eventIds AND r.status = 'CONFIRMED'
+            GROUP BY r.event.id
+            """)
+    List<Tuple> countConfirmedRequestsByEventIds(@Param("eventIds") List<Long> eventIds);
 }
