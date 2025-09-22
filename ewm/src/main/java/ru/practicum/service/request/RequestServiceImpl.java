@@ -43,11 +43,11 @@ public class RequestServiceImpl implements RequestService {
         validateCreation(user, event);
 
         return RequestDtoMapper.mapRequestToDto(requestRepository.save(Request.builder()
-                        .createdOn(LocalDateTime.now())
-                        .event(event)
-                        .requester(user)
-                        .status(event.getRequestModeration() ? RequestStatus.PENDING : RequestStatus.CONFIRMED)
-                        .build()));
+                .createdOn(LocalDateTime.now())
+                .event(event)
+                .requester(user)
+                .status(event.getRequestModeration() ? RequestStatus.PENDING : RequestStatus.CONFIRMED)
+                .build()));
     }
 
     @Override
@@ -93,8 +93,8 @@ public class RequestServiceImpl implements RequestService {
             throw new AlreadyExistsException("Для пользователя " + user.getId() + " уже существует запрос на участие в событие " + event.getId());
         }
 
-        if (requestRepository.countByEventAndStatus(event.getId(), RequestStatus.CONFIRMED.name()) >= event.getParticipantLimit()) {
-            throw new AlreadyExistsException("Достигнут лимит запросов на участие" + event.getId());
+        if (event.getParticipantLimit() !=0 && requestRepository.countByEventAndStatus(event.getId(), RequestStatus.CONFIRMED) >= event.getParticipantLimit()) {
+            throw new AlreadyExistsException("Достигнут лимит запросов на участие " + event.getId());
         }
     }
 }

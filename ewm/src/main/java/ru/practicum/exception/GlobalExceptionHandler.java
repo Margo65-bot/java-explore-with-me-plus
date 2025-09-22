@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
                 .map(error -> String.format("%s: %s", error.getField(), error.getDefaultMessage()))
                 .toList();
         return new ApiError("BAD_REQUEST", "Переданные в метод контроллера данные, не проходят " +
-                "проверку на валидацию", e.getMessage(), errors);
+                                           "проверку на валидацию", e.getMessage(), errors);
     }
 
     @ExceptionHandler
@@ -49,7 +49,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError handleNotFoundException(final AlreadyExistsException e) {
+    public ApiError handleAlreadyExistsException(final AlreadyExistsException e) {
         log.warn("409 {}", e.getMessage(), e);
         return new ApiError("CONFLICT", "Нарушение ограничения уникальности", e.getMessage());
     }
@@ -62,11 +62,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ApiError handleException(final Exception e) {
-        log.warn("500 {}", e.getMessage(), e);
-        return new ApiError("INTERNAL_SERVER_ERROR", "На сервере произошла внутренняя ошибка",
-                e.getMessage());
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleConditionsNotMetException(final ConditionsNotMetException e) {
+        log.warn("409 {}", e.getMessage(), e);
+        return new ApiError("CONFLICT", "Нарушение ограничений", e.getMessage());
     }
 
     @ExceptionHandler
@@ -75,6 +74,22 @@ public class GlobalExceptionHandler {
         log.warn("400 {}", e.getMessage(), e);
 
         return new ApiError("BAD_REQUEST", "Переданные в метод контроллера данные, не проходят " +
-                "проверку на валидацию", e.getMessage());
+                                           "проверку на валидацию", e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleIllegalArgumentException(final IllegalArgumentException e) {
+        log.warn("400 {}", e.getMessage(), e);
+
+        return new ApiError("BAD_REQUEST", "Передан неправильный аргумент", e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiError handleException(final Exception e) {
+        log.warn("500 {}", e.getMessage(), e);
+        return new ApiError("INTERNAL_SERVER_ERROR", "На сервере произошла внутренняя ошибка",
+                e.getMessage());
     }
 }

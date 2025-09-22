@@ -9,7 +9,7 @@ spring:
         jdbc.time_zone: UTC
         format_sql: true
     show-sql: true
-  database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
   sql.init.mode: always
   datasource:
     url: jdbc:postgresql://localhost:5433/ewmdb
@@ -26,7 +26,9 @@ logging:
       orm.jpa.JpaTransactionManager: DEBUG
 
 stats:
-  service.url: http://localhost:9090
+  service:
+    url: http://localhost:9090
+    name: "ewm-main-service"
   date_time.format: "yyyy-MM-dd HH:mm:ss"
 
 ---
