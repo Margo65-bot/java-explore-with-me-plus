@@ -37,7 +37,14 @@ public class GlobalExceptionHandler {
                 .map(error -> String.format("%s: %s", error.getField(), error.getDefaultMessage()))
                 .toList();
         return new ApiError("BAD_REQUEST", "Переданные в метод контроллера данные, не проходят " +
-                                           "проверку на валидацию", e.getMessage(), errors);
+                "проверку на валидацию", e.getMessage(), errors);
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleCommentStateException(final CommentStateException e) {
+        log.warn("400 {}", e.getMessage(), e);
+        return new ApiError("BAD_REQUEST", "Несоответствие статуса комментария", e.getMessage());
     }
 
     @ExceptionHandler
@@ -67,7 +74,7 @@ public class GlobalExceptionHandler {
         log.warn("400 {}", e.getMessage(), e);
 
         return new ApiError("BAD_REQUEST", "Переданные в метод контроллера данные, не проходят " +
-                                           "проверку на валидацию", e.getMessage());
+                "проверку на валидацию", e.getMessage());
     }
 
     @ExceptionHandler
@@ -76,6 +83,14 @@ public class GlobalExceptionHandler {
         log.warn("400 {}", e.getMessage(), e);
 
         return new ApiError("BAD_REQUEST", "Передан неправильный аргумент", e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiError handleIAccessDeniedException(final AccessDeniedException e) {
+        log.warn("403 {}", e.getMessage(), e);
+
+        return new ApiError("FORBIDDEN", "Доступ к этой операции запрещён", e.getMessage());
     }
 
     @ExceptionHandler
